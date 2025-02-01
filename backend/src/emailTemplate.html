@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Confirmation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #4C9B63;
+            --secondary-green: #2ECC71;
+            --accent-blue: #3498DB;
+            --neutral-gray: #7F8C8D;
+            --background-white: #F7F9FA;
+            --text-dark: #2C3E50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background-color: var(--background-white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .email-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .service-type {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--secondary-green);
+            color: var(--primary-green);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .section {
+            background-color: #f9fafb;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .section-title {
+            color: var(--primary-green);
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '•';
+            color: var(--primary-green);
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--neutral-gray);
+            font-weight: 600;
+        }
+
+        .service-list {
+            list-style: none;
+        }
+
+        .service-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .service-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-green);
+            font-weight: bold;
+        }
+
+        .total-amount {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            text-align: center;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .footer {
+            background-color: #f9fafb;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .email-container {
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            .content, .header, .footer {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+
+            .amount {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">RECT</div>
+            <h1 class="title">Service Confirmation – {{customerName}}</h1>
+        </div>
+
+        <div class="content">
+            <div class="service-type">
+                {{cleaningType}} Cleaning Service
+            </div>
+
+            <div class="section">
+                <div class="section-title">Service Details</div>
+                <div class="info-row">
+                    <span class="info-label">Area Size</span>
+                    <span>{{area}} square meters</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Service Address</span>
+                    <span>{{address}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Scheduled Time</span>
+                    <span>{{dateTime}}</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">What's Included</div>
+                <ul class="service-list">
+                    <li>Complete cleaning of specified area</li>
+                    <li>Thorough dusting and wiping of all surfaces</li>
+                    <li>Floor cleaning appropriate to surface type</li>
+                    <li>Special attention to high-traffic areas</li>
+                    <li>Cleaning materials and equipment included</li>
+                </ul>
+            </div>
+
+            <div class="total-amount">
+                <div>Total Amount</div>
+                <div class="amount">€{{price}}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Next Steps</div>
+                <ul class="service-list">
+                    <li>Our cleaning team will arrive at {{dateTime}}</li>
+                    <li>Please ensure access to all areas that need cleaning</li>
+                    <li>Our team will contact you 30 minutes before arrival</li>
+                    <li>Payment can be made after service completion</li>
+                </ul>
+            </div>
+
+            <div class="footer">
+                <div>
+                    <a href="#">Facebook</a>
+                    <a href="#">Twitter</a>
+                    <a href="#">Instagram</a>
+                </div>
+                <div style="margin: 20px 0;">
+                    Need help? Contact us at: {{supportEmail}}
+                </div>
+                <div>
+                    <a href="#">Terms & Conditions</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+                <p style="margin-top: 20px; color: var(--neutral-gray); font-size: 14px;">
+                    © 2024 {{companyName}}. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

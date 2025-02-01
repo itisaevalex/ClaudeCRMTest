@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Booking Reminder</title>
+    <style>
+        /* Reset styles */
+        body, p, h1, h2, h3, h4, h5, h6, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Container styles */
+        .email-wrapper {
+            background-color: #f3f4f6;
+            padding: 40px 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        /* Header styles */
+        .header {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Content styles */
+        .content {
+            padding: 40px 30px;
+            background-color: #ffffff;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+
+        .reminder-alert {
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 24px;
+            margin: 24px 0;
+            border-radius: 8px;
+        }
+
+        .reminder-alert h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .reminder-alert p {
+            color: #1e3a8a;
+            font-size: 16px;
+        }
+
+        .booking-details {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .booking-details h2 {
+            font-size: 16px;
+            color: #4b5563;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .preparation-list {
+            margin-top: 32px;
+            padding: 24px;
+            background-color: #f0f9ff;
+            border-radius: 8px;
+        }
+
+        .preparation-list h2 {
+            color: #0369a1;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .preparation-list ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .preparation-list li {
+            margin-bottom: 12px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .preparation-list li:before {
+            content: "•";
+            color: #3b82f6;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #f8fafc;
+            padding: 32px 20px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .social-links {
+            margin-bottom: 20px;
+        }
+
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .footer-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            color: #3b82f6;
+            text-decoration: none;
+            margin: 0 8px;
+            font-size: 14px;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 20px 10px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <div class="header">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18" />
+                        <path d="M18.7 8.7V18H9.3V6.3h7.4" />
+                        <path d="M9.3 6.3L18.7 8.7" />
+                    </svg>
+                </div>
+                <h1>Your Cleaning Service is Coming Soon!</h1>
+            </div>
+
+            <div class="content">
+                <p class="greeting">Dear {{customerName}},</p>
+                <p>Thank you for choosing our cleaning service. We're preparing for your upcoming appointment!</p>
+
+                <div class="reminder-alert">
+                    <h2>⏰ Reminder: Cleaning Service in 1 Hour</h2>
+                    <p>Our cleaning team will arrive at your location shortly.</p>
+                </div>
+
+                <div class="booking-details">
+                    <h2>Booking Details</h2>
+                    <div class="detail-item">
+                        <span class="detail-label">Service Area</span>
+                        <span class="detail-value">{{area}} square meters</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Arrival Time</span>
+                        <span class="detail-value">{{dateTime}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Service Address</span>
+                        <span class="detail-value">{{address}}</span>
+                    </div>
+                </div>
+
+                <div class="preparation-list">
+                    <h2>Quick Preparation Checklist</h2>
+                    <ul>
+                        <li>Ensure someone is available to let our team in</li>
+                        <li>Clear any valuable or fragile items</li>
+                        <li>Secure any pets in a safe area</li>
+                        <li>Have your payment method ready</li>
+                    </ul>
+                </div>
+
+                <p style="color: #4b5563; margin-top: 24px;">
+                    If you need to reach us urgently, please call: <strong>{{supportPhone}}</strong>
+                </p>
+            </div>
+
+            <div class="footer">
+                <div class="social-links">
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">Instagram</a>
+                </div>
+                <p class="footer-text">Need to reschedule?</p>
+                <p class="footer-text">Contact us at: support@cleaningservice.com</p>
+                <div style="margin-top: 20px;">
+                    <a href="#" class="footer-links">Terms & Conditions</a>
+                    <a href="#" class="footer-links">Privacy Policy</a>
+                </div>
+                <p class="footer-text" style="margin-top: 20px;">
+                    &copy; 2024 Cleaning Service. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

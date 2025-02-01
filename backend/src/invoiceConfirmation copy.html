@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Service Invoice</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; background-color: #f5f5f5;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f5f5f5">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" border="0" width="600" bgcolor="#ffffff" style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <div style="color: #4C9B63; font-size: 20px; font-weight: bold; margin-bottom: 30px;">
+                                {{cleaningType}} Service Invoice
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Invoice Details -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="color: #666; font-weight: bold;">Invoice Date</td>
+                                    <td>{{invoiceDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #666; font-weight: bold;">Customer Name</td>
+                                    <td>{{customerName}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #666; font-weight: bold;">Service Address</td>
+                                    <td>{{address}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #666; font-weight: bold;">Service Date</td>
+                                    <td>{{dateTime}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Service Details -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <div style="color: #4C9B63; font-size: 18px; font-weight: bold; margin: 20px 0;">
+                                SERVICE DETAILS
+                            </div>
+                            <table width="100%" cellpadding="12" cellspacing="0" style="margin-bottom: 30px; background-color: #f8f9fa;">
+                                <tr>
+                                    <th align="left" style="color: #4C9B63;">Service</th>
+                                    <th align="left" style="color: #4C9B63;">Area (m²)</th>
+                                    <th align="right" style="color: #4C9B63;">Amount</th>
+                                </tr>
+                                <tr>
+                                    <td>{{cleaningType}} Cleaning</td>
+                                    <td>{{area}}</td>
+                                    <td align="right">€{{price}}</td>
+                                </tr>
+                                {{#each serviceItems}}
+                                <tr>
+                                    <td>{{name}}</td>
+                                    <td>{{quantity}}</td>
+                                    <td align="right">€{{total}}</td>
+                                </tr>
+                                {{/each}}
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Total Amount -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table width="100%" cellpadding="20" cellspacing="0" style="margin-bottom: 30px; background-color: #4C9B63; border-radius: 8px;">
+                                <tr>
+                                    <td style="color: white; text-align: center;">
+                                        <div>Total Amount Due</div>
+                                        <div style="font-size: 24px; font-weight: bold;">€{{price}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; text-align: center; color: #666;">
+                            <p>© 2024 {{companyName}}. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

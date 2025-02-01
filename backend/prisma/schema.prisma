@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Customer {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  name          String
+  phone         String
+  address       String
+  bookings      Booking[]
+  communications Communication[]
+  totalRevenue  Float           @default(0)
+  lastService   DateTime?
+  nextService   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Communication {
+  id           Int      @id @default(autoincrement())
+  type         String   // 'email' or 'sms'
+  subject      String
+  content      String
+  sentAt       DateTime @default(now())
+  status       String   @default("pending") // pending, sent, failed
+  customerId   Int
+  customer     Customer @relation(fields: [customerId], references: [id])
+  bookingId    Int?
+  booking      Booking? @relation(fields: [bookingId], references: [id])
+}
+
+model ServiceItem {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String?
+  frequency    String?
+  bookingId    Int
+  booking      Booking  @relation(fields: [bookingId], references: [id])
+}
+
+model Booking {
+  id            Int             @id @default(autoincrement())
+  area          Int
+  dateTime      DateTime
+  price         Float
+  cleaningType  String
+  duration      Int             @default(2)
+  status        String          @default("pending") // pending, confirmed, completed, cancelled
+  reminderSent  Boolean         @default(false)
+  customer      Customer        @relation(fields: [customerId], references: [id])
+  customerId    Int
+  serviceItems  ServiceItem[]
+  communications Communication[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Settings {
+  id              Int      @id @default(autoincrement())
+  companyName     String   @default("Your Company Name")
+  phoneNumber     String   @default("")
+  address         String   @default("")
+  emailSettings   Json     // For storing email configuration
+  baseRate        Float    @default(0)
+  workingHours    Json     // For storing working hours
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
