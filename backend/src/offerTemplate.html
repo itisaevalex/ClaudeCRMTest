@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer - {{customerName}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            font-size: 11px;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo-text span {
+            color: #4CAF50;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .date {
+            margin-bottom: 10px;
+        }
+
+        .customer-info {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .work-description {
+            margin-bottom: 20px;
+        }
+
+        .main-service {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 15px;
+        }
+
+        .service-items {
+            margin-bottom: 20px;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .service-content {
+            flex: 1;
+        }
+
+        .service-name {
+            font-weight: bold;
+        }
+
+        .service-description {
+            color: #444;
+            margin-top: 3px;
+        }
+
+        .service-frequency {
+            text-align: right;
+            min-width: 120px;
+            padding-left: 15px;
+        }
+
+        .line {
+            border-top: 1px solid #000;
+            margin: 15px 0;
+        }
+
+        .periodic-services {
+            margin-top: 15px;
+        }
+
+        .notes {
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+
+        .price-section {
+            margin-top: 30px;
+        }
+
+        .price {
+            font-weight: bold;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+
+        .cleaning-hours {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <div class="logo-text">RE<span>CT</span></div>
+    </div>
+
+    <div class="header">
+        <div class="date">{{date}}</div>
+        <p>Thank you for your inquiry. We hope you find this offer advantageous!</p>
+    </div>
+
+    <div class="customer-info">
+        <strong>Customer:</strong> {{customerName}}<br>
+        <strong>Address:</strong> {{address}}
+    </div>
+
+    <div class="work-description">
+        <div class="section-title">WORK DESCRIPTION:</div>
+        
+        <div class="main-service">
+            {{cleaningType}} Cleaning - {{area}} square meters
+        </div>
+
+        {{#if serviceItems.length}}
+        <div class="service-items">
+            {{#each serviceItems}}
+            <div class="service-item">
+                <div class="service-content">
+                    <div class="service-name">{{name}}</div>
+                    <div class="service-description">{{description}}</div>
+                </div>
+                <div class="service-frequency">{{frequency}}</div>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+    </div>
+
+    <div class="line"></div>
+
+    <div class="periodic-services">
+        <div class="section-title">PERIODIC SERVICES</div>
+        <div class="service-item">
+            <div class="service-content">
+                Window cleaning inside, between, and outside, as well as thorough cleaning of the stairwell
+            </div>
+            <div class="service-frequency">Upon request/order</div>
+        </div>
+    </div>
+
+    <div class="notes">
+        The work description is based on your requirements, but it's always possible to add or remove services as needed. The price includes all necessary cleaning materials.
+    </div>
+
+    <div class="price-section">
+        <div class="price">Your discounted price is: €{{price}} excl. VAT</div>
+        <div class="cleaning-hours">
+            We will clean for 4-5 hours per session, depending on the needs and to ensure your satisfaction!
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Service Invoice</title>
+    <style>
+        .header {
+            background-color: #4C9B63;
+            color: white;
+            padding: 48px 40px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .header .company-name {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .header .title {
+            color: white;
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.7;
+            background-color: #f5f5f5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 12px;
+        }
+
+        .section-title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .main-service {
+            padding: 0 48px;
+            margin: 32px 0;
+            background-color: transparent;
+            border-left: none;
+        }
+
+        .main-service .title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .main-service .content {
+            color: #2C3E50;
+            font-size: 15px;
+            padding-left: 8px;
+        }
+
+        .invoice-details {
+            padding: 0 48px;
+            margin: 48px 0 32px;
+        }
+
+        .invoice-details td {
+            color: #666;
+            font-weight: bold;
+            padding: 16px 12px;
+        }
+
+        .service-details {
+            padding: 0 48px;
+            margin: 32px 0;
+        }
+
+        .service-details .title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 24px 0;
+            text-transform: uppercase;
+        }
+
+        .service-details table {
+            margin: 24px 0 36px;
+            background-color: #f8f9fa;
+        }
+
+        .service-details th,
+        .service-details td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: left;
+        }
+
+        .service-details th {
+            color: #4C9B63;
+            font-weight: 600;
+        }
+
+        .service-details th:nth-child(1),
+        .service-details td:nth-child(1) {
+            width: 30%;
+        }
+
+        .service-details th:nth-child(2),
+        .service-details td:nth-child(2) {
+            width: 40%;
+        }
+
+        .service-details th:nth-child(3),
+        .service-details td:nth-child(3) {
+            width: 30%;
+            text-align: right;
+        }
+
+        .total-amount {
+            padding: 0 48px;
+            margin: 40px 0;
+        }
+
+        .total-amount table {
+            background-color: #4C9B63;
+            border-radius: 12px;
+        }
+
+        .total-amount td {
+            color: white;
+            text-align: center;
+            padding: 28px;
+        }
+
+        .total-amount .amount {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .bank-details {
+            padding: 0 48px;
+            margin: 48px 0;
+        }
+
+        .bank-details .title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .bank-details table {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bank-details td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .bank-details tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bank-details td:first-child {
+            color: #666;
+            font-weight: bold;
+            width: 140px;
+        }
+
+        .bank-details td:last-child {
+            color: #2C3E50;
+        }
+
+        .bank-details .note {
+            margin-top: 16px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .payment-instructions .title,
+        .bank-details .title,
+        .service-details .title,
+        .main-service .title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .payment-instructions {
+            padding: 0 48px;
+            margin: 48px 0;
+        }
+
+        .payment-instructions .title {
+            color: #4C9B63;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .payment-instructions ul {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px 40px;
+            margin: 0;
+            list-style-type: none;
+        }
+
+        .payment-instructions li {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            color: #2C3E50;
+        }
+
+        .payment-instructions li:before {
+            content: "•";
+            color: #4C9B63;
+            position: absolute;
+            left: 0;
+            font-size: 20px;
+        }
+
+        .social-links {
+            text-align: center;
+            padding: 24px 48px;
+        }
+
+        .social-links a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 12px;
+            font-weight: 600;
+        }
+
+        .social-links a:hover {
+            color: #4C9B63;
+        }
+
+        .contact-info {
+            text-align: center;
+            padding: 0 48px 24px;
+            color: #666;
+        }
+
+        .contact-info a {
+            color: #4C9B63;
+            text-decoration: none;
+        }
+
+        .terms {
+            text-align: center;
+            padding: 0 48px 24px;
+        }
+
+        .terms a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 12px;
+            font-weight: 600;
+        }
+
+        .terms a:hover {
+            color: #4C9B63;
+        }
+
+        .footer {
+            padding: 36px 48px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 36px 24px;
+            }
+
+            .main-service,
+            .invoice-details,
+            .service-details,
+            .total-amount,
+            .footer {
+                padding: 0 24px;
+            }
+
+            td {
+                padding: 12px 8px;
+            }
+
+            .service-details th,
+            .service-details td {
+                padding: 12px;
+            }
+
+            .total-amount td {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f5f5f5">
+        <tr>
+            <td align="center" style="padding: 48px 24px;">
+                <table cellpadding="0" cellspacing="0" border="0" width="600" bgcolor="#ffffff" style="            border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header">
+                            <div class="company-name">RECT</div>
+                            <div class="title">Service Confirmation – {{customerName}}</div>
+                        </td>
+                    </tr>
+
+                    <!-- Invoice Details -->
+                    <tr>
+                        <td class="invoice-details">
+                            <table width="100%" cellpadding="8" cellspacing="0">
+                                <tr>
+                                    <td>Invoice Date</td>
+                                    <td>{{invoiceDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Customer Name</td>
+                                    <td>{{customerName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Service Address</td>
+                                    <td>{{address}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Service Date</td>
+                                    <td>{{dateTime}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Main Service -->
+                    <tr>
+                        <td class="main-service">
+                            <div class="title">Main Service</div>
+                            <div class="content">{{cleaningType}} - {{area}} square meters</div>
+                        </td>
+                    </tr>
+
+                    <!-- Service Details -->
+                    <tr>
+                        <td class="service-details">
+                            <div class="title">Service Details</div>
+                            <table width="100%" cellpadding="12" cellspacing="0">
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Description</th>
+                                    <th>Frequency</th>
+                                </tr>
+                                {{#each serviceItems}}
+                                <tr>
+                                    <td>{{name}}</td>
+                                    <td>{{description}}</td>
+                                    <td>{{frequency}}</td>
+                                </tr>
+                                {{/each}}
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Total Amount -->
+                    <tr>
+                        <td class="total-amount">
+                            <table width="100%" cellpadding="20" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <div>Total Amount Due</div>
+                                        <div class="amount">€{{price}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Payment Instructions -->
+                    <tr>
+                        <td class="payment-instructions">
+                            <div class="title">Payment Instructions</div>
+                            <ul>
+                                <li>Please pay the total amount within 14 days</li>
+                                <li>Use invoice number as reference when making payment</li>
+                                <li>Bank transfer details provided below</li>
+                            </ul>
+                        </td>
+                    </tr>
+
+                    <!-- Bank Details -->
+                    <tr>
+                        <td class="bank-details">
+                            <div class="title">Bank Details</div>
+                            <table width="100%" cellpadding="8" cellspacing="0">
+                                <tr>
+                                    <td>Bank Name</td>
+                                    <td>{{bankName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Account Holder</td>
+                                    <td>{{companyName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>IBAN</td>
+                                    <td>{{bankIBAN}}</td>
+                                </tr>
+                                <tr>
+                                    <td>BIC/SWIFT</td>
+                                    <td>{{bankBIC}}</td>
+                                </tr>
+                            </table>
+                            <div class="note">We accept payment via bank transfer. For any questions, please contact our billing department.</div>
+                        </td>
+                    </tr>
+
+                    <!-- Social Links -->
+                    <tr>
+                        <td class="social-links">
+                            <a href="#">Facebook</a>
+                            <a href="#">Twitter</a>
+                            <a href="#">Instagram</a>
+                        </td>
+                    </tr>
+
+                    <!-- Contact -->
+                    <tr>
+                        <td class="contact-info">
+                            <div>Need help? Contact us at: <a href="mailto:mintpostai@outlook.com">mintpostai@outlook.com</a></div>
+                        </td>
+                    </tr>
+
+                    <!-- Terms -->
+                    <tr>
+                        <td class="terms">
+                            <a href="#">Terms & Conditions</a>
+                            <a href="#">Privacy Policy</a>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p>© {{companyName}}. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
