@@ -120,7 +120,7 @@ export default function BookingForm() {
     e.preventDefault();
     
     if (isSubmitting) {
-      return; // Prevent multiple submissions
+      return;
     }
     
     if (!selectedDate || !selectedTime || !area || !cleaningType) {
@@ -131,53 +131,82 @@ export default function BookingForm() {
     try {
       setIsSubmitting(true);
   
+      // Format the date and time properly
+      const dateTimeString = formatDateTime(selectedDate, selectedTime);
+      if (!dateTimeString) {
+        throw new Error('Invalid date/time format');
+      }
+  
+      // Prepare the booking details in the format expected by our updated backend
       const bookingDetails = {
         area,
-        dateTime: formatDateTime(selectedDate, selectedTime),
-        customerDetails,
+        dateTime: dateTimeString,
+        customerDetails: {
+          name: customerDetails.name,
+          email: customerDetails.email,
+          phone: customerDetails.phone,
+          address: customerDetails.address
+        },
         price: manualPrice || price,
         cleaningType,
         isBusinessCustomer,
-        serviceItems,
+        ...(serviceItems.length > 0 && {
+          serviceItems: serviceItems.map(item => ({
+            name: item.name || null,
+            description: item.description || null,
+            frequency: item.frequency || null
+          }))
+        }),
         duration
       };
-  
-      const response = await fetch(`${API_URL}/api/create-booking`, {
+
+      // Send the request to the updated endpoint
+      const response = await fetch(`${API_URL}/api/bookings`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(bookingDetails),
       });
   
-      if (response.ok) {
-        const data = await response.json();
-        alert('Booking submitted successfully!');
-        console.log('Response:', data);
-        
-        // Reset form
-        setArea(0);
-        setSelectedDate(undefined);
-        setSelectedTime(null);
-        setCleaningType('');
-        setServiceItems([]);
-        setDuration(2);
-        setManualPrice(0);
-        setCustomerDetails({
-          name: '',
-          email: '',
-          phone: '',
-          address: '',
-        });
-      } else {
-        const errorData = await response.json().catch(() => null);
-        console.error('Booking failed:', errorData);
-        alert(`Booking failed. ${errorData?.message || 'Please try again.'}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create booking');
       }
+  
+      const result = await response.json();
+  
+      alert('Booking submitted successfully!');
+      console.log('Booking created:', result);
+      
+      // Reset form
+      resetForm();
+      
     } catch (error) {
       console.error('Error submitting booking:', error);
-      alert('Network error occurred. Please check your connection and try again.');
+      alert(error instanceof Error ? error.message : 'Failed to submit booking. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+  
+  // Add a helper function to reset the form
+  const resetForm = () => {
+    setArea(0);
+    setSelectedDate(undefined);
+    setSelectedTime(null);
+    setCleaningType('');
+    setServiceItems([]);
+    setDuration(2);
+    setManualPrice(0);
+    setCustomerDetails({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+    });
+    setIsBusinessCustomer(false);
   };
 
   // Calculate price using the useBookingPrice hook
@@ -267,65 +296,51 @@ export default function BookingForm() {
             </div>
           </div>
 
-          {/* Service Items Section */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <label className="block text-sm font-medium text-gray-700">
-                Additional Services
-              </label>
-              <button
-                type="button"
-                onClick={addServiceItem}
-                className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                Add Service
-              </button>
-            </div>
-
-            {serviceItems.map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-3">
-                <div className="flex justify-between items-start">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Service {index + 1}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => removeServiceItem(index)}
-                    className="text-gray-400 hover:text-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Service Name"
-                    value={item.name}
-                    onChange={(e) => updateServiceItem(index, 'name', e.target.value)}
-                    className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  
-                  <textarea
-                    placeholder="Service Description"
-                    value={item.description}
-                    onChange={(e) => updateServiceItem(index, 'description', e.target.value)}
-                    className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    rows={2}
-                  />
-                  
-                  <input
-                    type="text"
-                    placeholder="Frequency (e.g., 2 times per week)"
-                    value={item.frequency}
-                    onChange={(e) => updateServiceItem(index, 'frequency', e.target.value)}
-                    className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-            ))}
+        {/* Service Items Section */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <label className="block text-sm font-medium text-gray-700">
+              Additional Services (Optional)
+            </label>
+            <button
+              type="button"
+              onClick={addServiceItem}
+              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Service
+            </button>
           </div>
+          
+          {serviceItems.map((item, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-3">
+              {/* ... rest of the service item fields ... */}
+              <input
+                type="text"
+                placeholder="Service Name (Optional)"
+                value={item.name || ''}
+                onChange={(e) => updateServiceItem(index, 'name', e.target.value)}
+                className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              
+              <textarea
+                placeholder="Service Description (Optional)"
+                value={item.description || ''}
+                onChange={(e) => updateServiceItem(index, 'description', e.target.value)}
+                className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                rows={2}
+              />
+              
+              <input
+                type="text"
+                placeholder="Frequency (Optional)"
+                value={item.frequency || ''}
+                onChange={(e) => updateServiceItem(index, 'frequency', e.target.value)}
+                className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          ))}
+        </div>
 
           {/* Area Input */}
           <div>
@@ -397,16 +412,17 @@ export default function BookingForm() {
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <div className="relative">
-              <input
-                type="email"
-                required
-                className="pr-10 block w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                value={customerDetails.email}
-                onChange={(e) =>
-                  setCustomerDetails({ ...customerDetails, email: e.target.value })
-                }
-                onBlur={() => handleInputBlur('email')}
-              />
+            <input
+              type="email"
+              required
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+              className="pr-10 block w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              value={customerDetails.email}
+              onChange={(e) =>
+                setCustomerDetails({ ...customerDetails, email: e.target.value })
+              }
+              onBlur={() => handleInputBlur('email')}
+            />
               <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
