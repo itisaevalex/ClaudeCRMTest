@@ -11,6 +11,7 @@ async function seed() {
         area: 100,
         dateTime: new Date('2024-12-18T20:36:15.000Z'),
         price: 1500,
+        cleaningType: 'Home',
         customerId: 3,
         reminderSent: false
       }

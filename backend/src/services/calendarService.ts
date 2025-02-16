@@ -1,27 +1,7 @@
 import { google, calendar_v3 } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { Booking, Customer } from '@prisma/client';
+import { Customer, CalendarEventData, TimeSlot } from '../types/booking';
 
-interface CalendarEventData {
-  startTime: Date;
-  endTime: Date;
-  area: number;
-  cleaningType: string;
-  price: number;
-  duration: number;
-  serviceItems?: Array<{
-    name: string;
-    description: string;
-    frequency: string;
-  }>;
-  isBusinessCustomer: boolean;
-}
-
-interface TimeSlot {
-  startTime: string;
-  endTime: string;
-  available: boolean;
-}
 
 export class CalendarService {
   private calendar: calendar_v3.Calendar;

@@ -18,9 +18,9 @@ export class BookingController {
     try {
       const bookingData = req.body as CreateBookingRequest;
       
-      // Create booking with all related data
-      const result = await this.bookingService.createBooking(bookingData);
-      
+      // Create booking with all related data - **Pass 'req' object here**
+      const result = await this.bookingService.createBooking(bookingData, req);
+
       if (!result.booking || !result.calendarEvent) {
         throw new Error('Failed to create booking or calendar event');
       }

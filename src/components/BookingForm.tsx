@@ -6,6 +6,7 @@ import PriceEditor from './PriceEditor';
 import SubmitButton from './SubmitButton';
 import { PreviewButton, PreviewModal } from './PDFPreview';
 import Calendar from './Calendar';
+import { supabase } from '../lib/supabaseClient'; // importing supabase to handle authentication
 
 const API_URL = 'http://localhost:5001';
 
@@ -130,58 +131,78 @@ export default function BookingForm() {
   
     try {
       setIsSubmitting(true);
-  
+      
+      // Get Supabase session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Authentication required');
+      }
+
       // Format the date and time properly
       const dateTimeString = formatDateTime(selectedDate, selectedTime);
       if (!dateTimeString) {
         throw new Error('Invalid date/time format');
       }
-  
-      // Prepare the booking details in the format expected by our updated backend
-      const bookingDetails = {
-        area,
-        dateTime: dateTimeString,
-        customerDetails: {
-          name: customerDetails.name,
-          email: customerDetails.email,
-          phone: customerDetails.phone,
-          address: customerDetails.address
-        },
-        price: manualPrice || price,
-        cleaningType,
-        isBusinessCustomer,
-        ...(serviceItems.length > 0 && {
-          serviceItems: serviceItems.map(item => ({
-            name: item.name || null,
-            description: item.description || null,
-            frequency: item.frequency || null
-          }))
-        }),
-        duration
-      };
-
-      // Send the request to the updated endpoint
-      const response = await fetch(`${API_URL}/api/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(bookingDetails),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create booking');
-      }
-  
-      const result = await response.json();
-  
-      alert('Booking submitted successfully!');
-      console.log('Booking created:', result);
       
-      // Reset form
-      resetForm();
+    const bookingDetails = {
+      area,
+      dateTime: dateTimeString,
+      customerDetails,
+      price: manualPrice || price,
+      cleaningType,
+      isBusinessCustomer,
+      serviceItems: serviceItems.map(item => ({
+        name: item.name || null,
+        description: item.description || null,
+        frequency: item.frequency || null
+      })),
+      duration
+    };
+
+      
+      const jwtToken = session.access_token;  // Use the session from above
+
+      /// sending the request to the endpoint
+      try {
+        console.log('Sending booking data:', bookingDetails);
+
+        const response = await fetch(`${API_URL}/api/bookings/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`, // **ADD THIS LINE: Include JWT in header**
+          },
+          body: JSON.stringify(bookingDetails),
+        });
+
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+
+        try { // Wrap JSON.parse in a try-catch block
+          const data = JSON.parse(responseText);
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to create booking');
+          }
+          const result = await response.json(); // Redundant, data is already parsed
+          alert('Booking submitted successfully!');
+          console.log('Booking created:', result);
+
+          // Reset form
+          resetForm();
+          return data; // Return parsed data
+          
+        } catch (parseError) {
+          console.error('Error parsing JSON response:', parseError);
+          throw new Error('Failed to parse server response.'); // Indicate parsing error
+        }
+
+      } catch (error) {
+        console.error('Error details:', error);
+        throw error;
+      }
       
     } catch (error) {
       console.error('Error submitting booking:', error);

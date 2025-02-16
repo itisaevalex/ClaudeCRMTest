@@ -101,13 +101,12 @@ export const validateBookingRequest = (
     }
   }
 
-  // Validate phone number format (basic example - adjust regex as needed)
-  const phoneRegex = /^\+?[\d\s-]{8,}$/;
-  if (!phoneRegex.test(booking.customerDetails.phone)) {
-    return res.status(400).json({
-      error: 'Invalid phone number format',
-    });
-  }
+// Replace with this simpler check
+if (!booking.customerDetails.phone) {
+  return res.status(400).json({
+      error: 'Phone number is required',
+  });
+}
 
   // Validate future date
   const now = new Date();
@@ -144,8 +143,55 @@ export const validateBookingUpdateRequest = (
   res: Response,
   next: NextFunction
 ) => {
-  // Similar validation logic for booking updates
-  // Might have different requirements than creating a new booking
+  const booking = req.body;
+
+  // Check if the request body exists
+  if (!booking || Object.keys(booking).length === 0) {
+    return res.status(400).json({
+      error: 'Request body cannot be empty',
+    });
+  }
+
+  // Validate date and time if provided
+  if (booking.dateTime) {
+    const bookingDate = new Date(booking.dateTime);
+    if (isNaN(bookingDate.getTime())) {
+      return res.status(400).json({
+        error: 'Invalid date and time format',
+      });
+    }
+  }
+
+  // Validate numeric values if provided
+  if (booking.area !== undefined && booking.area <= 0) {
+    return res.status(400).json({
+      error: 'Area must be greater than 0',
+    });
+  }
+
+  if (booking.price !== undefined && booking.price <= 0) {
+    return res.status(400).json({
+      error: 'Price must be greater than 0',
+    });
+  }
+
+  if (booking.duration !== undefined && booking.duration <= 0) {
+    return res.status(400).json({
+      error: 'Duration must be greater than 0',
+    });
+  }
+
+  // Validate cleaning type if provided
+  if (booking.cleaningType) {
+    const validCleaningTypes = ['Home', 'Office', 'Move-out'];
+    if (!validCleaningTypes.includes(booking.cleaningType)) {
+      return res.status(400).json({
+        error: 'Invalid cleaning type',
+      });
+    }
+  }
+
+  // If all validations pass, continue
   next();
 };
 

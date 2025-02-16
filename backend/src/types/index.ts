@@ -43,7 +43,6 @@ export interface BookingEmailData {
 }
 
 export interface CalendarEventResponse {
-  data: calendar_v3.Schema$Event;
   status: number;
   statusText: string;
   headers: object;

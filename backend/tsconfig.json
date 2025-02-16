@@ -12,8 +12,14 @@
     "baseUrl": ".",
     "paths": {
       "@services/*": ["src/services/*"]
-    }
+    },
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",    
+    "src/**/*.d.ts",
+    "src/types/*.d.ts", // Adding a changed express file for middleware authentication of the user
+    "src/types/**/*.d.ts" // Adding a changed express file for middleware authentication of the user
+  ],
   "exclude": ["node_modules"]
 }

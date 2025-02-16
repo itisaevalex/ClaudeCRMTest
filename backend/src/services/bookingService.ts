@@ -1,159 +1,151 @@
-import { PrismaClient, Booking, Customer } from '@prisma/client';
-import { CreateBookingRequest, ServiceItemCreateInput } from '../types';
+import { supabase } from '../utils/supabase';
+import { CreateBookingRequest } from '../types';
 import { CalendarService } from './calendarService';
-import { calendar_v3 } from 'googleapis';
+import { Request } from 'express'; // importing custom request file containing the req.user extension
 
 export class BookingService {
-  private prisma: PrismaClient;
-  private calendarService: CalendarService;
+ private calendarService: CalendarService;
 
-  constructor() {
-    this.prisma = new PrismaClient();
-    this.calendarService = new CalendarService();
+ constructor() {
+   this.calendarService = new CalendarService();
+ }
+
+ async createBooking(bookingData: CreateBookingRequest, req: Request) {
+  const user = req.user; // Get user from request object
+
+  if (!user) { // User should always be present if middleware passed, but good to check
+    throw new Error('Not authenticated'); // Still throw error if user is unexpectedly missing
   }
+  
+  // More detailed debug logging
+  console.log('Attempting booking creation with:', {
+    userId: user.id,
+    userIdType: typeof user.id,
+    userEmail: user.email,
+    rawUser: JSON.stringify(user)
+  });
 
-  async createBooking(bookingData: CreateBookingRequest) {
-    const { customerDetails, serviceItems = [], ...bookingDetails } = bookingData;
+  const { customerDetails, serviceItems = [], ...bookingDetails } = bookingData;
+ 
+  try {
+    // First try to get existing customer by email
+    const { data: existingCustomer } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('email', customerDetails.email)
+      .single();
 
-    // Create/update customer
-    const customer = await this.prisma.customer.upsert({
-      where: { email: customerDetails.email },
-      update: customerDetails,
-      create: customerDetails,
-    });
+    // Create or update customer
+    const { data: customer, error: customerError } = await supabase
+      .from('customers')
+      .upsert({
+        ...(existingCustomer?.id ? { id: existingCustomer.id } : {}),
+        ...customerDetails,
+        user_id: user.id,
+      }, {
+        onConflict: 'email'  // Remove 'returning' option as it's not supported
+      })
+      .select()
+      .single();
 
-    // Create service items
-    const serviceItemsData: ServiceItemCreateInput[] = serviceItems.map(item => ({
-      name: item.name,
-      description: item.description ?? null,
-      frequency: item.frequency ?? null,
-    }));
+    if (customerError) {
+      console.error('Customer error details:', customerError);
+      throw customerError;
+    }
 
-    // Create booking
-    const booking = await this.prisma.booking.create({
-      data: {
-        ...bookingDetails,
-        dateTime: new Date(bookingDetails.dateTime),
-        reminderSent: false,
-        customer: {
-          connect: { id: customer.id }
-        },
-        serviceItems: {
-          create: serviceItemsData
-        }
-      },
-      include: {
-        customer: true,
-        serviceItems: true,
-      }
-    });
 
-    // Create calendar event
-    const calendarEvent = await this.createCalendarEvent(booking, customer, bookingData);
+  // Create booking with snake_case column names
+  const { data: booking, error: bookingError } = await supabase
+  .from('bookings')
+  .insert({
+    area: bookingDetails.area,
+    date_time: new Date(bookingDetails.dateTime),
+    price: bookingDetails.price,
+    cleaning_type: bookingDetails.cleaningType, // Changed from cleaningType to cleaning_type
+    duration: bookingDetails.duration,
+    customer_id: customer.id,
+    user_id: user.id,
+    reminder_sent: false,
+    status: 'pending'
+  })
+  .select()
+  .single();
 
-    return { booking, calendarEvent };
+  if (bookingError) {
+    console.error('Booking error:', bookingError);
+    throw bookingError;
   }
-
-  private async createCalendarEvent(
-    booking: Booking & { serviceItems: any[]; customer: Customer },
-    customer: Customer,
-    bookingData: CreateBookingRequest
-  ) {
-    const startTime = new Date(booking.dateTime);
-    const endTime = new Date(startTime);
-    endTime.setHours(startTime.getHours() + (booking.duration || 2));
-
-    const formattedServiceItems = booking.serviceItems.map(item => ({
-      name: item.name,
+ 
+  const startTime = new Date(booking.date_time);
+  const endTime = new Date(startTime);
+  endTime.setHours(startTime.getHours() + booking.duration);
+ 
+  const calendarEvent = await this.calendarService.createEvent({
+    startTime,
+    endTime,
+    area: booking.area,
+    cleaningType: booking.cleaning_type,
+    price: booking.price,
+    duration: booking.duration,
+    serviceItems: serviceItems.map(item => ({
+      name: item.name || '',
       description: item.description || '',
       frequency: item.frequency || ''
-    }));
-
-    return this.calendarService.createEvent(
-      {
-        startTime,
-        endTime,
-        area: booking.area,
-        cleaningType: booking.cleaningType,
-        price: booking.price,
-        duration: booking.duration,
-        serviceItems: formattedServiceItems,
-        isBusinessCustomer: bookingData.isBusinessCustomer,
-      },
-      customer
-    );
+    })),
+    isBusinessCustomer: bookingData.isBusinessCustomer
+  }, customer);
+ 
+  return { booking, calendarEvent };
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw error;
   }
+}
 
-  async getAllBookings() {
-    return this.prisma.booking.findMany({
-      include: {
-        customer: true,
-        serviceItems: true
-      },
-      orderBy: {
-        dateTime: 'asc'
-      }
-    });
-  }
+async getAllBookings() {
+ const { data, error } = await supabase
+   .from('bookings')
+   .select(`
+     *,
+     customer:customers(*),
+     service_items:service_items(*)
+   `)
+   .order('date_time', { ascending: false });
 
-  async getDashboardStats() {
-    const currentDate = new Date();
-    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+ if (error) throw error;
+ return data;
+}
 
-    const [monthlyBookings, upcomingBookings, completedBookings, totalRevenue] = await Promise.all([
-      this.prisma.booking.count({
-        where: {
-          dateTime: {
-            gte: startOfMonth,
-            lte: endOfMonth
-          }
-        }
-      }),
-      this.prisma.booking.count({
-        where: {
-          dateTime: {
-            gt: currentDate
-          }
-        }
-      }),
-      this.prisma.booking.count({
-        where: {
-          dateTime: {
-            lt: currentDate
-          }
-        }
-      }),
-      this.prisma.booking.aggregate({
-        where: {
-          dateTime: {
-            gte: startOfMonth,
-            lte: endOfMonth
-          }
-        },
-        _sum: {
-          price: true
-        }
-      })
-    ]);
+async getDashboardStats() {
+ const currentDate = new Date();
+ const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+ const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-    return {
-      monthlyRevenue: totalRevenue._sum.price || 0,
-      totalBookings: monthlyBookings,
-      upcomingBookings,
-      completedBookings
-    };
-  }
+ const { data, error } = await supabase
+   .from('bookings')
+   .select('date_time, price');
 
-  async getRecentTransactions() {
-    return this.prisma.booking.findMany({
-      take: 10,
-      orderBy: {
-        dateTime: 'desc'
-      },
-      include: {
-        customer: true
-      }
-    });
-  }
+ if (error) throw error;
+
+ return {
+   monthlyRevenue: data.reduce((sum, b) => sum + b.price, 0),
+   totalBookings: data.length,
+   upcomingBookings: data.filter(b => new Date(b.date_time) > currentDate).length,
+   completedBookings: data.filter(b => new Date(b.date_time) <= currentDate).length
+ };
+}
+
+async getRecentTransactions() {
+ const { data, error } = await supabase
+   .from('bookings')
+   .select(`
+     *,
+     customer:customers(*)
+   `)
+   .order('date_time', { ascending: false })
+   .limit(10);
+
+ if (error) throw error;
+ return data;
+}
 }
